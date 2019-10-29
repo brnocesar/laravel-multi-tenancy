@@ -1,10 +1,10 @@
-<p text-align="center">
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Laravel.svg/1200px-Laravel.svg.png" width="120">
-<img src="https://cdn3.iconfinder.com/data/icons/ui-icons-5/16/plus-small-01-512.png" width="100">
-<img src="https://avatars1.githubusercontent.com/u/33319474?s=400&v=4" width="120">
+<p align="center">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Laravel.svg/1200px-Laravel.svg.png" width="90">
+<img src="https://cdn3.iconfinder.com/data/icons/ui-icons-5/16/plus-small-01-512.png" width="90">
+<img src="https://avatars1.githubusercontent.com/u/33319474?s=400&v=4" width="90">
 </p>
 
-<p text-align="center">
+<p align="center">
 <a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Canil Status"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://awesome.re/mentioned-badge.svg" alt="Mentioned in Awesome Laravel"></a>
@@ -25,6 +25,7 @@ Além disso, é recomendável que você já tenha desenvolvido ao menos um proje
 A versão do Laravel utilizada neste projeto é a 5.8. Para criar um projeto especificamente com esta versão utilizamos o comando abaixo:
 ```sh
 $ composer create-project --prefer-dist laravel/laravel proj "5.8.*"
+```
 
 ## 2. Configurando o ambiente para instalação do pacote Tenancy<a name="sec2"></a>
 ### 2.1. Configurações de conexão
@@ -92,3 +93,4 @@ A versão 5.8 do Laravel é compatível com a versão [5.4](https://tenancy.dev/
 
 ```sh
 project$ composer require "hyn/multi-tenant:5.4.*"
+```
