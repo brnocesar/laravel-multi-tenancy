@@ -13,7 +13,7 @@ class StoreTenantRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,10 +21,24 @@ class StoreTenantRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
-    {
+    public function rules(){
         return [
-            //
+            'responsavel' => 'required|max:255',
+            'fantasia' => 'required|max:255',
+            'cidade' => 'required|max:255',
+            'razao_social' => 'required|max:255',
+            'cnpj' => 'required|numeric',
+        ];
+    }
+
+    public function messages(){
+        return [
+            'responsavel.required' => 'Campo Responsavel é obrigatório!',
+            'fantasia.required' => 'Campo Nome Fantasia é obrigatório!',
+            'cidade.required' => 'Campo Cidade é obrigatório!',
+            'razao_social.required' => 'Campo Razão social é obrigatório!',
+            'cnpj.required' => 'Campo CNPJ é obrigatório!',
+            'cnpj.numeric' => 'Campo CNPJ deve receber um número!',
         ];
     }
 }
