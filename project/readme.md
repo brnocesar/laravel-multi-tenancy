@@ -94,3 +94,80 @@ A versão 5.8 do Laravel é compatível com a versão [5.4](https://tenancy.dev/
 ```sh
 project$ composer require "hyn/multi-tenant:5.4.*"
 ```
+
+### 2.3. Configurações iniciais do pacote e projeto
+Após adicionar o pacote como uma dependência do projeto, devemos "publicar" os arquivos do Tenancy no projeto, ou seja, copiar os arquivos (_migrations_, configurações e etc, marcados com a tag) para nosso projeto:
+
+```sh
+project$ php artisan vendor:publish --tag=tenancy
+```
+
+Agora que temos as _migrations_ do pacote, **devemos** criar uma pasta chamada `tenant` dentro do diretório `database/migrations`. Esta nova pasta irá armazenar as migrations comuns aos tenants, permitindo rodar de forma independente cada conjunto de _migrations_. As primeiras _migrations_ que colocaremos neste novo diretório são as criadas por padrão pelo Laravel, para tanto, copiamos (NÃO movemos, COPIAMOS!) os arquivos abaixo para o diretório `tenant`:
+
+`2014_10_12_000000_create_users_table.php` e `2014_10_12_100000_create_password_resets_table.php`
+
+Devemos fazer um _"include"_ (não estou bem certo que é exatamente isso) no **model User** para forçar a conexão correta a ser feita na Base de Dados (melhorar essa parte!). Para isso basta adicionar:
+```php
+<?php
+
+namespace App;
+
+use Illuminate\Notifications\Notifiable;
+use Hyn\Tenancy\Traits\UsesTenantConnection;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class User extends Authenticatable{
+    use Notifiable, UsesTenantConnection;
+    ...
+}
+
+```
+
+Além disso, devemos inserir o código abaixo no método `boot()` do arquivo `app/Providers/AppServiceProvider.php` para definir a conexão `tenant` como padrão quando um website _tenant_ for identificado:
+```php
+use Illuminate\Support\ServiceProvider;
+use Hyn\Tenancy\Environment;
+
+class AppServiceProvider extends ServiceProvider{
+    public function boot(){        
+        $env = app(Environment::class);
+
+        if ($fqdn = optional($env->hostname())->fqdn) {
+            config(['database.default' => 'tenant']);
+        }
+    }
+}
+```
+
+Se você estiver usando o MySQL deve habilitar a _flag_ `uuid-limit-length-to-32` no arquivo `config/tenancy`, pois o MySQL não suporta nomes para as bases de dados com mais de 32 caracteres.
+
+Talvez (dependendo da sua versão do Banco de Dados) você tenha que adicionar mais uma alteração no método `boot()` do aqruivo `app/Providers/AppServiceProvider.php`. Se trata da configuração do tamanho padrão de _strings_ armazenadas nas tabelas do Banco de Dados (ou algo do tipo... melhorar esta parte!)
+```php
+use Hyn\Tenancy\Environment;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Schema;
+
+class AppServiceProvider extends ServiceProvider{
+    public function boot(){
+        Schema::defaultStringLength(191);
+        
+        $env = app(Environment::class);
+
+        if ($fqdn = optional($env->hostname())->fqdn) {
+            config(['database.default' => 'tenant']);
+        }
+    }
+}
+```
+
+Após isso, executamos o comando abaixo para rodar as _migrations_ do sistema e teremos cinco novas tabelas: users, password_resets, migrations, hostnames e websites.
+```sh
+project$ php artisan migrate --database=system
+```
+
+Não há necessidade de especificar a conexão usada pois o comando acima roda as migrations "do sistema", ou seja, as que estão fora da pasta `tenant`. Para rodar apenas as migrations que são comuns a todos os `tenants` podemos utilizar o comando apresentado abaixo, porém, usualmente isso não será necessário (eu também não tenho certeza se ele rodaria as migrations em todos os _tenats_ que existem). Na próxima seção vamos adicionar um método ao `controller` que será responsável por rodar as `migrations` de cada tenant quando ele for criado.
+```sh
+project$ php artisan tenancy:migrate
+```
+
+## 3. Controller para tenants e suas rotas
