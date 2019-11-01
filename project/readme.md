@@ -90,22 +90,32 @@ DB_PASSWORD=senhaMuitoDificil
 
 ### 2.2. Adicionando o pacote Tenancy como uma dependência do projeto
 A versão 5.8 do Laravel é compatível com a versão [5.4](https://tenancy.dev/docs/hyn/5.4) do Tenancy, portanto, é esta versão do pacote que iremos instalar através do Composer.
-
 ```sh
 project$ composer require "hyn/multi-tenant:5.4.*"
 ```
-
 ### 2.3. Configurações iniciais do pacote e projeto
+#### 2.3.1. Ajustando/definindo as _migrations_
 Após adicionar o pacote como uma dependência do projeto, devemos "publicar" os arquivos do Tenancy no projeto, ou seja, copiar os arquivos (_migrations_, configurações e etc, marcados com a tag) para nosso projeto:
-
 ```sh
 project$ php artisan vendor:publish --tag=tenancy
 ```
-
-Agora que temos as _migrations_ do pacote, **devemos** criar uma pasta chamada `tenant` dentro do diretório `database/migrations`. Esta nova pasta irá armazenar as migrations comuns aos tenants, permitindo rodar de forma independente cada conjunto de _migrations_. As primeiras _migrations_ que colocaremos neste novo diretório são as criadas por padrão pelo Laravel, para tanto, copiamos (NÃO movemos, COPIAMOS!) os arquivos abaixo para o diretório `tenant`:
-
+Agora que temos as _migrations_ do pacote podemos adicionar novas colunas à tabela _hostnames_. O comando abaixo irá criar um arquivo com nome similar`2019_xx_xx_xxxxxx_tenancy_add_fields_hostnames.php` no diretório padrão das _migrations_. Basta especificar as novas colunas na função `up()`, como no bloco abaixo:
+```php
+    public function up()
+    {
+        Schema::table('hostnames', function (Blueprint $table) {
+            $table->string('responsavel')->nullable();
+            $table->string('fantasia')->nullable();
+            $table->string('cidade')->nullable();
+            $table->string('razao_social')->nullable();
+            $table->string('cnpj')->nullable();
+        });
+    }
+```
+Também **devemos** criar uma pasta chamada `tenant` dentro do diretório `database/migrations`. Esta nova pasta irá armazenar as migrations comuns aos tenants, permitindo rodar de forma independente cada conjunto de _migrations_. As primeiras _migrations_ que colocaremos neste novo diretório são as criadas por padrão pelo Laravel, para tanto, copiamos (NÃO movemos, COPIAMOS!) os arquivos abaixo para o diretório `tenant`:
 `2014_10_12_000000_create_users_table.php` e `2014_10_12_100000_create_password_resets_table.php`
 
+#### 2.3.2. _Includes_
 Devemos fazer um _"include"_ (não estou bem certo que é exatamente isso) no **model User** para forçar a conexão correta a ser feita na Base de Dados (melhorar essa parte!). Para isso basta adicionar:
 ```php
 <?php
@@ -122,7 +132,6 @@ class User extends Authenticatable{
 }
 
 ```
-
 Além disso, devemos inserir o código abaixo no método `boot()` do arquivo `app/Providers/AppServiceProvider.php` para definir a conexão `tenant` como padrão quando um website _tenant_ for identificado:
 ```php
 use Illuminate\Support\ServiceProvider;
@@ -139,6 +148,7 @@ class AppServiceProvider extends ServiceProvider{
 }
 ```
 
+#### 2.3.3. Configurações do Banco de Dados
 Se você estiver usando o MySQL deve habilitar a _flag_ `uuid-limit-length-to-32` no arquivo `config/tenancy`, pois o MySQL não suporta nomes para as bases de dados com mais de 32 caracteres.
 
 Talvez (dependendo da sua versão do Banco de Dados) você tenha que adicionar mais uma alteração no método `boot()` do aqruivo `app/Providers/AppServiceProvider.php`. Se trata da configuração do tamanho padrão de _strings_ armazenadas nas tabelas do Banco de Dados (ou algo do tipo... melhorar esta parte!)
@@ -159,15 +169,121 @@ class AppServiceProvider extends ServiceProvider{
     }
 }
 ```
-
+#### 2.3.4. Rodando as _migrations_
 Após isso, executamos o comando abaixo para rodar as _migrations_ do sistema e teremos cinco novas tabelas: users, password_resets, migrations, hostnames e websites.
 ```sh
 project$ php artisan migrate --database=system
 ```
-
-Não há necessidade de especificar a conexão usada pois o comando acima roda as migrations "do sistema", ou seja, as que estão fora da pasta `tenant`. Para rodar apenas as migrations que são comuns a todos os `tenants` podemos utilizar o comando apresentado abaixo, porém, usualmente isso não será necessário (eu também não tenho certeza se ele rodaria as migrations em todos os _tenats_ que existem). Na próxima seção vamos adicionar um método ao `controller` que será responsável por rodar as `migrations` de cada tenant quando ele for criado.
+Não há necessidade de especificar a conexão usada pois o comando acima roda as migrations "do sistema principal", ou seja, as que estão fora da pasta `tenant`. Para rodar as migrations de todos os `tenants` podemos utilizar o comando apresentado abaixo, porém, usualmente isso não será necessário. Na próxima seção vamos adicionar um método ao `controller` que será responsável por rodar as `migrations` de cada tenant quando ele for criado.
 ```sh
 project$ php artisan tenancy:migrate
 ```
+## 3. Criando _tenants_
+### 3.1. _Controller_
+Como serão poucos _controllers_ para o sistema principal, podemos cria-lo no local padrão sem muita preocupação com a organização dos diretórios. Então rodamos o comando:
+```sh
+project$ php artisan make:controller TenantController
+```
+Vamos escrever um método `store()` no _controller_ que será responsável por criar os _tenants_. Escrevemos um método para garantir que o nome da Base de dados não ultrapasse 32 caracteres de comprimento (`setLimitCharacters()`) e rodamos as _migrations_ do _tenant_ criado atráves do método `runMigrations()`, que é chamado no retorno de `store()`.
+```php
+class TenantController extends Controller
+{
+    public function store(StoreTenantRequest $request){
+        $subDominio = Str::slug($request->fantasia .'-'. $request->cidade);
 
-## 3. Controller para tenants e suas rotas
+        $website = new Website();
+        $website->uuid = $this->setLimitCharacters( $subDominio );
+        app(WebsiteRepository::class)->create( $website );
+
+        $hostname = Hostname::create( [
+            'responsavel' => $request->responsavel,
+            'fantasia' => $request->fantasia,
+            'cidade' => $request->cidade,
+            'razao_social' => $request->razao_social,
+            'cnpj' => $request->cnpj,
+            'fqdn' =>  $subDominio .'.'. $request->getHost(),
+        ] );
+        $hostname = app(HostnameRepository::class)->create( $hostname );
+        app(HostnameRepository::class)->attach( $hostname, $website );
+
+        return response()->json( [ $this->runMigrations($website), $hostname ], 200);
+    }
+
+    public function setLimitCharacters(String $subDomain){
+        $subDomain = str_replace('-','_', $subDomain) .'_';
+        $countCharacters = strlen($subDomain);
+
+        if( $countCharacters <= 16){
+            $subDomain .= strtolower( Str::random(16) );
+        }
+        elseif( $countCharacters > 16 and  $countCharacters < 32 ){
+            $randomSequenceLen = 32 - $countCharacters;
+            $subDomain .= strtolower( Str::random( $randomSequenceLen ) );
+        }
+        else{
+            $subDomain = substr($subDomain, 0, 31);
+        }
+
+        return $subDomain;
+    }
+
+    public function runMigrations(Website $website){
+        $migrated = Artisan::call('tenancy:migrate', [
+            '--website_id' => $website->id,
+        ]);
+
+        if( !$migrated ){ // return FALSE for sucess
+            return 'Tenant criado com sucesso.';
+        }
+        return 'Erro ao rodar migrations.';
+    }
+}
+```
+
+Por enquanto as únicas validações que fazemos são na requisição e se as _migrations_ do _tenant_ foram rodadas com sucesso. Para validar a requisição criamos um _formrequest_ para o método `store()`.
+```sh
+project$ php artisan make:request StoreTenantController
+```
+No _formrequest_ especificamos a obrigatoriedade, o tipo de dados que cada _field_ deve receber e as mensagens de erro.
+```php
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreTenantRequest extends FormRequest
+{
+    public function authorize(){
+        return true;
+    }
+
+    public function rules(){
+        return [
+            'responsavel' => 'required|max:255',
+            'fantasia' => 'required|max:255',
+            'cidade' => 'required|max:255',
+            'razao_social' => 'required|max:255',
+            'cnpj' => 'required|numeric',
+        ];
+    }
+
+    public function messages(){
+        return [
+            'responsavel.required' => 'Campo Responsavel é obrigatório!',
+            'fantasia.required' => 'Campo Nome Fantasia é obrigatório!',
+            'cidade.required' => 'Campo Cidade é obrigatório!',
+            'razao_social.required' => 'Campo Razão social é obrigatório!',
+            'cnpj.required' => 'Campo CNPJ é obrigatório!',
+            'cnpj.numeric' => 'Campo CNPJ deve receber um número!',
+        ];
+    }
+}
+```
+### 3.2. Rotas
+Por fim adicionamos um rota para este método no arquivo `routes/web.php`. Fazemos do tipo GET, assim podemos testar usando a URL:
+```php
+Route::get('createTenant', 'TenantController@store');
+```
+
+### 3.3. Testando
