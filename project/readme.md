@@ -287,3 +287,25 @@ Route::get('createTenant', 'TenantController@store');
 ```
 
 ### 3.3. Testando
+Até esse momento o funcionamento esperado é o seguinte:
+1. após acessarmos a rota do método `store()` passando os devidos parâmetros (de forma correta) devemos receber um json com as informações do _tenant_ criado;
+2. é criada uma base de dados de nome `<nome fantasia>-<cidade>-<sequencia aleatória de caractéres>` 
+3. podemos acessar o endereço do novo _tenant_: `<nome fantasia>-<cidade>-<sequencia aleatória de caractéres>.project.local.br`, que é um subdomínio do da aplicação principal.
+
+Para verificar se o sistema está fazendo a mudança de Base de Dados, podemos fazer o registro na aplicação. Como se tratam de diferentes bases de dados, será possível utilizar as mesmas credênciais de usuário para registro no sistema principal e em cada um dos _tenats_.
+
+Para criar a autenticação do sistema rodamos o comando abaixo:
+```sh
+project$ php artisan make:auth
+```
+Para testar nossa aplicação devemos configurar um Virtual Host no Apache. (...)
+
+Abra o seu navegador e acesse o endereço do domínio principal que você colocou nos arquivos `/conf/httpd-vhosts.conf` ou `/etc/hosts` (em meu caso, por exemplo, é `project.local.br`), você será redirecionado para a página inicial padrão do Laravel. Então acesse a rota do método `store()` pela URL e passe os parâmetros da requisição, como mostrado abaixo:
+```
+project.local.br/createTenant?responsavel=Potter Potatos&fantasia=Batatinha&cidade=Curitiba&razao_social=Batatas Infinitas LTDA&cnpj=12345678
+```
+Se tudo deu certo, agora temos duas URLs:
+- a da aplicação principal (`project.local.br`) e
+- de um _tenant_ (`batatinha-curitiba.lara-ency.local.br`).
+
+Acesse o seu Banco de Dados (terminal ou SGBD) e verifique se foi criada um Base de Dados com o nome seguindo o padrão mencionado acima. Se isso aconteceu, acesse ambos os endereços e efetue o registro com as mesmas credênciais. Se o procedimento for realizado com sucesso em ambos, significa que a troca de Base de Dados está sendo feita corretamente.
