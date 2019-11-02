@@ -125,7 +125,7 @@ return [
          *
          * @warn this must be a FQDN, these have no protocol or path!
          */
-        'default' => env('TENANCY_DEFAULT_HOSTNAME'),
+        'default' => env('TENANCY_DEFAULT_HOSTNAME', 'project.local.br'),
         /**
          * The package is able to identify the requested hostname by itself,
          * disable to get full control (and responsibility) over hostname
