@@ -24,7 +24,7 @@ Além disso, é recomendável que você já tenha desenvolvido ao menos um proje
 ## 1. Criando o projeto Laravel<a name="sec1"></a>
 A versão do Laravel utilizada neste projeto é a 5.8. Para criar um projeto especificamente com esta versão utilizamos o comando abaixo:
 ```sh
-$ composer create-project --prefer-dist laravel/laravel proj "5.8.*"
+$ composer create-project --prefer-dist laravel/laravel project "5.8.*"
 ```
 
 ## 2. Configurando o ambiente para instalação do pacote Tenancy<a name="sec2"></a>
@@ -33,9 +33,9 @@ Antes de fazer a instalação do pacote através do Composer, é necessário con
 Você pode criar esse usuário e a base de dados "_master_" por linha de comando (exemplo abaixo) ou no seu SGBD de preferência.
 
 ```sql
-CREATE DATABASE IF NOT EXISTS tenancy;
-CREATE USER IF NOT EXISTS tenancy@localhost IDENTIFIED BY 'someRandomAndVeryComplexPassword';
-GRANT ALL PRIVILEGES ON *.* TO tenancy@localhost WITH GRANT OPTION;
+CREATE DATABASE IF NOT EXISTS tenancy_db;
+CREATE USER IF NOT EXISTS tenancy_user@localhost IDENTIFIED BY 'someRandomAndVeryComplexPassword';
+GRANT ALL PRIVILEGES ON *.* TO tenancy_user@localhost WITH GRANT OPTION;
 ```
 Após isso devemos configurar as conexões com o Banco de Dados no nosso projeto. Conexões no plural porque é necessário mais de uma, duas no caso: uma para a Base de Dados principal e outra para realizar a troca entre as Bases de Dados.
 
@@ -54,7 +54,7 @@ Vá até o arquivo `config/database.php` e adicione as novas conexões abaixo da
             'port' => env('TENANCY_PORT', '3306'),
             'database' => env('TENANCY_DATABASE', 'tenancy_db'),
             'username' => env('TENANCY_USERNAME', 'tenancy_user'),
-            'password' => env('TENANCY_PASSWORD', 'senhaMuitoDificil'),
+            'password' => env('TENANCY_PASSWORD', 'someRandomAndVeryComplexPassword'),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
@@ -68,7 +68,7 @@ Vá até o arquivo `config/database.php` e adicione as novas conexões abaixo da
             'port' => env('TENANCY_PORT', '3306'),
             'database' => env('TENANCY_DATABASE', 'tenancy_db'),
             'username' => env('TENANCY_USERNAME', 'tenancy_user'),
-            'password' => env('TENANCY_PASSWORD', 'senhaMuitoDificil'),
+            'password' => env('TENANCY_PASSWORD', 'someRandomAndVeryComplexPassword'),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
@@ -85,7 +85,7 @@ DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=tenancy_db
 DB_USERNAME=tenancy_user
-DB_PASSWORD=senhaMuitoDificil
+DB_PASSWORD=someRandomAndVeryComplexPassword
 ```
 
 ### 2.2. Adicionando o pacote Tenancy como uma dependência do projeto
@@ -99,7 +99,7 @@ Após adicionar o pacote como uma dependência do projeto, devemos "publicar" os
 ```sh
 project$ php artisan vendor:publish --tag=tenancy
 ```
-Agora que temos as _migrations_ do pacote podemos adicionar novas colunas à tabela _hostnames_. O comando abaixo irá criar um arquivo com nome similar`2019_xx_xx_xxxxxx_tenancy_add_fields_hostnames.php` no diretório padrão das _migrations_. Basta especificar as novas colunas na função `up()`, como no bloco abaixo:
+Agora que temos as _migrations_ do pacote podemos adicionar novas colunas à tabela _hostnames_. O comando abaixo irá criar um arquivo com nome similar a `2019_xx_xx_xxxxxx_tenancy_add_fields_hostnames.php` no diretório padrão das _migrations_. Basta especificar as novas colunas na função `up()`, como no bloco abaixo:
 ```php
     public function up()
     {
@@ -151,7 +151,7 @@ class AppServiceProvider extends ServiceProvider{
 #### 2.3.3. Configurações do Banco de Dados
 Se você estiver usando o MySQL deve habilitar a _flag_ `uuid-limit-length-to-32` no arquivo `config/tenancy`, pois o MySQL não suporta nomes para as bases de dados com mais de 32 caracteres.
 
-Talvez (dependendo da sua versão do Banco de Dados) você tenha que adicionar mais uma alteração no método `boot()` do aqruivo `app/Providers/AppServiceProvider.php`. Se trata da configuração do tamanho padrão de _strings_ armazenadas nas tabelas do Banco de Dados (ou algo do tipo... melhorar esta parte!)
+Talvez (dependendo da sua versão do Banco de Dados) você tenha que adicionar mais uma alteração no método `boot()` do aqruivo `app/Providers/AppServiceProvider.php`. Se trata da configuração do tamanho padrão de _strings_ armazenadas nas tabelas do Banco de Dados (ou algo do tipo...)
 ```php
 use Hyn\Tenancy\Environment;
 use Illuminate\Support\ServiceProvider;
@@ -178,13 +178,14 @@ Não há necessidade de especificar a conexão usada pois o comando acima roda a
 ```sh
 project$ php artisan tenancy:migrate
 ```
+
 ## 3. Criando _tenants_
 ### 3.1. _Controller_
 Como serão poucos _controllers_ para o sistema principal, podemos cria-lo no local padrão sem muita preocupação com a organização dos diretórios. Então rodamos o comando:
 ```sh
 project$ php artisan make:controller TenantController
 ```
-Vamos escrever um método `store()` no _controller_ que será responsável por criar os _tenants_. Escrevemos um método para garantir que o nome da Base de dados não ultrapasse 32 caracteres de comprimento (`setLimitCharacters()`) e rodamos as _migrations_ do _tenant_ criado atráves do método `runMigrations()`, que é chamado no retorno de `store()`.
+Vamos escrever um método `store()` no que será responsável por criar os _tenants_. Escrevemos um método para garantir que o nome da Base de dados não ultrapasse 32 caracteres de comprimento (`setLimitCharacters()`) e rodamos as _migrations_ do _tenant_ criado atráves do método `runMigrations()`, que é chamado no retorno de `store()`.
 ```php
 class TenantController extends Controller
 {
@@ -281,7 +282,7 @@ class StoreTenantRequest extends FormRequest
 }
 ```
 ### 3.2. Rotas
-Por fim adicionamos um rota para este método no arquivo `routes/web.php`. Fazemos do tipo GET, assim podemos testar usando a URL:
+Por fim adicionamos uma rota para este método no arquivo `routes/web.php`. Fazemos do tipo GET, o que nos permite testar usando a URL.
 ```php
 Route::get('createTenant', 'TenantController@store');
 ```
@@ -289,10 +290,10 @@ Route::get('createTenant', 'TenantController@store');
 ### 3.3. Testando
 Até esse momento o funcionamento esperado é o seguinte:
 1. após acessarmos a rota do método `store()` passando os devidos parâmetros (de forma correta) devemos receber um json com as informações do _tenant_ criado;
-2. é criada uma base de dados de nome `<nome fantasia>-<cidade>-<sequencia aleatória de caractéres>` 
-3. podemos acessar o endereço do novo _tenant_: `<nome fantasia>-<cidade>-<sequencia aleatória de caractéres>.project.local.br`, que é um subdomínio do da aplicação principal.
+2. é criada uma base de dados de nome `<nome fantasia>_<cidade>_<sequencia aleatória de caractéres>` 
+3. podemos acessar o endereço do novo _tenant_: `<nome fantasia>-<cidade>.project.local.br`, que é um subdomínio da aplicação principal.
 
-Para verificar se o sistema está fazendo a mudança de Base de Dados, podemos fazer o registro na aplicação. Como se tratam de diferentes bases de dados, será possível utilizar as mesmas credênciais de usuário para registro no sistema principal e em cada um dos _tenats_.
+Uma forma de verificar se o sistema está trocando as Bases de Dados é fazer o registro na aplicação. Como se tratam de diferentes Bases de Dados, será possível utilizar as mesmas credênciais para registro no sistema principal e em cada um dos _tenats_.
 
 Para criar a autenticação do sistema rodamos o comando abaixo:
 ```sh
