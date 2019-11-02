@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTenantRequest;
+use Hyn\Tenancy\Repositories\HostnameRepository;
+use Hyn\Tenancy\Repositories\WebsiteRepository as HynWebsiteRepository;
 use Hyn\Tenancy\Models\Hostname;
 use Hyn\Tenancy\Models\Website;
-use Hyn\Tenancy\Repositories\HostnameRepository;
-use Hyn\Tenancy\Repositories\WebsiteRepository;
-use Illuminate\Http\Request;
-use Psy\Util\Str;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
+
 
 class TenantController extends Controller
 {
@@ -17,7 +20,8 @@ class TenantController extends Controller
 
         $website = new Website();
         $website->uuid = $this->setLimitCharacters( $subDominio );
-        app(WebsiteRepository::class)->create( $website );
+        app(HynWebsiteRepository::class)->create( $website );
+        // dd($website);
 
         $hostname = Hostname::create( [
             'responsavel' => $request->responsavel,
