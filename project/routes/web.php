@@ -16,3 +16,7 @@ Route::get('/', function () {
 });
 
 Route::get('createTenant', 'TenantController@store');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
