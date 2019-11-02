@@ -5,10 +5,16 @@
 </p>
 
 <p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Canil Status"></a>
+<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://awesome.re/mentioned-badge.svg" alt="Mentioned in Awesome Laravel"></a>
 </p>
 
 # multi-tenancy
-Exemplo de aplicação web baseada na arquitetura "multi-tenant", desenvolvida com Laravel e o pacote Tenancy.
+Exemplo de aplicação web baseada no conceito "multi-tenant", desenvolvida com Laravel e o pacote Tenancy.
+
+## Funcionalidades
+### 1. Criação de _tenats_
+Para criar um _tenant_ devemos passar os seguintes parâmetros: mome do responsável pela empresa, nome fantasia, razão social, cidade e CNPJ. Cada _tenant_ criado pode ser acessado através de um subdomínio da aplicação principal. Este subdomínio é criado em função do nome fantasia e da cidade.
+
+###### por enquanto é isso ;)
