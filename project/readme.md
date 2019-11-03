@@ -14,11 +14,10 @@
 Exemplo de aplicação web baseada no conceito "multi-tenant", desenvolvida com Laravel e o pacote Tenancy.
 
 ## Guia de desenvolvimento (em construção)
-- (Capítulo 0 - Requisitos)[].
-- (Capítulo 1 - Criando o projeto Laravel)[].
-- (Capítulo 2 - Configurando o ambiente para instalação do pacote Tenancy)[].
-- (Capítulo 3 - Criando _tenants_)[].
-- (Capítulo 4 - Estrutura dos _tenants_)[].
+- [Capítulos 0 & 1 - Requisitos & Criando o projeto Laravel](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_0-1.md).
+- [Capítulo 2 - Configurando o ambiente para instalação do pacote Tenancy](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_2.md).
+- [Capítulo 3 - Criando _tenants_](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_3.md).
+- [Capítulo 4 - Estrutura dos _tenants_](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_4.md).
     - 4.1 - Estruturando os objetos/tabelas
     - 4.2 - CRUDs
         - 4.2.1 - Cargos
