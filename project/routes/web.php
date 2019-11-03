@@ -14,7 +14,14 @@
 Route::get('/', 'WelcomeController@index')->name('welcome');
 Route::get('/home', 'HomeController@index')->name('home');
 
+
 Route::get('createTenant', 'TenantController@store');
 
-Auth::routes();
+Route::get('createCargo', 'Tenants\CargoController@store');
+Route::get('showCargo', 'Tenants\CargoController@show');
+Route::get('updateCargo', 'Tenants\CargoController@update');
+Route::get('deleteCargo', 'Tenants\CargoController@destroy');
+Route::get('toListCargos', 'Tenants\CargoController@index');
 
+
+Auth::routes();
