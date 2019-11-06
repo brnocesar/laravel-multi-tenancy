@@ -10,7 +10,6 @@ class Cargo extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'nome',
         'codigo',
         'descricao',
         'status',

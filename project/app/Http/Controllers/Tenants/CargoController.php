@@ -35,7 +35,7 @@ class CargoController extends Controller
             return response()->json( [ 'Cargo não encontrado.', $cargo ], 400);
         }
 
-        $cargo->nome = $request->nome ? $request->nome : $cargo->nome;
+        // $cargo->nome = $request->nome ? $request->nome : $cargo->nome;
         $cargo->descricao = $request->descricao ? $request->descricao : $cargo->descricao;
         $cargo->codigo = $request->codigo ? $request->codigo : $cargo->codigo;
         if( $request->status != null ){

@@ -24,14 +24,14 @@ class StoreCargoRequest extends FormRequest
     public function rules()
     {
         return [
-            'nome' => 'required|string|max:255',
             'codigo' => 'required|numeric',
+            'descricao' => 'required|string|max:255',
         ];
     }
 
     public function messages(){
         return [
-            'nome.required' => 'Campo Cargo é obrigatório!',
+            'descricao.required' => 'Campo Cargo é obrigatório!',
             'codigo.required' => 'Campo Código é obrigatório!',
             'codigo.numeric' => 'Campo Código deve receber um número!',
         ];
