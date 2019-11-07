@@ -281,9 +281,13 @@ Além disso devemos definir a relação com a tabela 'colaboradores' no _model_ 
 
 Para o _controller_ de 'colaboradores' realizamos o mesmo procedimento da seção anterior: criamos o _controller_ no diretório `app/Http/Controllers/Tenants` e os _formrequests_ em `project/app/Http/Requests/Tenants/Colaborador`.
 
-Criamos as rotas da mesma forma que a seção anterior:
+Criamos as rotas da mesma forma que na seção anterior:
 ```php
-
+Route::get('createColaborador', 'Tenants\ColaboradorController@store');
+Route::get('showColaborador', 'Tenants\ColaboradorController@show');
+Route::get('updateColaborador', 'Tenants\ColaboradorController@update');
+Route::get('deleteColaborador', 'Tenants\ColaboradorController@destroy');
+Route::get('toListColaboradores', 'Tenants\ColaboradorController@index');
 ```
 
-Você pode acessar os arquivos originais no _commit_ (5b9b57e30e2cf63068406b8fe960c0f12ca2e906)[https://github.com/brnocesar/multi-tenancy/commit/5b9b57e30e2cf63068406b8fe960c0f12ca2e906].
+Você pode acessar os arquivos originais no _commit_ [5b9b57e30e2cf63068406b8fe960c0f12ca2e906](https://github.com/brnocesar/multi-tenancy/commit/5b9b57e30e2cf63068406b8fe960c0f12ca2e906).
