@@ -29,11 +29,12 @@ Cada _tenant_ criado pode ser acessado através de um subdomínio da aplicação
 #### 2.1. CRUD de Cargos
 Para criar 'cargos' em cada um dos _tenants_ devemos passar os seguintes parâmetros:
 - nome: _string_ não nula;
-- código: inteiro;
-- descrição: _string_
+- código: inteiro não nulo;
+- descrição: _string_;
 - status: _boolean_, 0 ou 1;
 - requerente: _boolean_, 0 ou 1.
-Também é possível ver um cargo em específico, editar, deletar e listar todos.
+
+Também é possível visualizar, editar e deletar um cargo específico, assim como listar todos que não foram deletados.
 
 ## Guia de desenvolvimento (em construção)
 - [Capítulos 0 & 1 - Requisitos & Criando o projeto Laravel](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_0-1.md).

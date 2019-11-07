@@ -216,4 +216,4 @@ Para acessá-las basta seguir o padrão:
 http://batatinha-curitiba.projeto-tenancy.local.br/<nome da rota>?<field>=<valor>&<field>=<valor>...
 ```
 
-Caso você queira conferir os arquivos originais, eles podem ser acessados no _commit_ (0791ef3c27a37c63c14b82bbe17ea5a4f1d10241)[https://github.com/brnocesar/multi-tenancy/commit/0791ef3c27a37c63c14b82bbe17ea5a4f1d10241].
+Caso você queira conferir os arquivos originais, eles podem ser acessados no _commit_ [0791ef3c27a37c63c14b82bbe17ea5a4f1d10241](https://github.com/brnocesar/multi-tenancy/commit/0791ef3c27a37c63c14b82bbe17ea5a4f1d10241).
