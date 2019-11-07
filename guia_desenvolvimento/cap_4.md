@@ -216,7 +216,7 @@ Para acessá-las basta seguir o padrão:
 http://batatinha-curitiba.projeto-tenancy.local.br/<nome da rota>?<field>=<valor>&<field>=<valor>...
 ```
 
-Caso você queira conferir os arquivos originais, eles podem ser acessados no _commit_ (0791ef3c27a37c63c14b82bbe17ea5a4f1d10241)[https://github.com/brnocesar/multi-tenancy/commit/0791ef3c27a37c63c14b82bbe17ea5a4f1d10241]. Note que no (_commit_)[https://github.com/brnocesar/multi-tenancy/commit/9c3e0272924c5c22567d7a68e4b5777f30860121] seguinte a coluna 'nome' foi retirada da tabela 'cargos' e a coluna 'descricao' assumiu este papel.
+Caso você queira conferir os arquivos originais, eles podem ser acessados no _commit_ [0791ef3c27a37c63c14b82bbe17ea5a4f1d10241](https://github.com/brnocesar/multi-tenancy/commit/0791ef3c27a37c63c14b82bbe17ea5a4f1d10241). Note que no [_commit_](https://github.com/brnocesar/multi-tenancy/commit/9c3e0272924c5c22567d7a68e4b5777f30860121) seguinte a coluna 'nome' foi retirada da tabela 'cargos' e a coluna 'descricao' assumiu este papel.
 
 #### 4.2.2. Colaboradores<a name='secao4.2.2'></a>
 Vamos iniciar agora o CRUD de colaboradores, em que será praticamento refeito o procedimento da seção anterior, apenas com uma pequena difereça na criação do _model_ e da _migration_. Ao contrário do objeto anterior em que obtivemos o seu plural acrescentando a letra 's', agora precisamos adicionar as letras 'es' ao final de colaborador para obtermos seu plural, e precisamos indicar isso ao Laravel (na verdade acho que o correto é dizer que "devemos indicar isso ao _Eloquent_", mas não tenho certeza). Portanto vamos criar _model_ e _migration_ separadas, explicitando o nome 'colaboradores' em ambas.
