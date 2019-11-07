@@ -13,7 +13,7 @@
 # Desenvolvimento de aplicação _Multi-tenant_ usando o pacote [Tenancy](https://tenancy.dev/)
 
 ## 4. Estrutura dos _tenants_
-### 4.1. Estruturando os objetos/tabelas
+### 4.1. Estruturando os objetos/tabelas<a name='secao4.1'></a>
 Os objetos necessários para que os _tenants_ funcionem são: **colaboradores**, **cargos**, **produtos** e **salários**. E eles se relacionam da seguinte forma:
 - cada **colaborador** cadastrado terá um **cargo**;
 - cada **cargo** pode ser ocupado por mais de um **colaborador**;
@@ -27,7 +27,7 @@ Agora vamos "traduzir" esses relacionamentos para a lógica das tabelas no Banco
 3. **colaboradores x salarios**: cada colaborador tem apenas um salário (`hasOne`) e cada salário é específico para o colaborador (`belongs`). Aqui temos a relação mais simples possível, 1:1, então precisamos apenas de uma chave estrangeira na 'salarios' apontando para 'colaboradores'.
 
 ### 4.2. CRUDs
-#### 4.2.1. Cargos
+#### 4.2.1. Cargos<a name='secao4.2.1'></a>
 ##### 4.2.1.1 _Model_ e _migration_
 Vamos começar pelo CRUD de cargos, sendo o primeiro passo criar uma _model_ com o nome `Cargo` (no singular). As _models_ são criadas por padrão na pasta `app` e com o intuito de organizar melhor os arquivos do nosso projeto, vamos alocar as _models_ relativas aos _tenants_ dentro da pasta `Models/Tenants`.
 
@@ -118,7 +118,7 @@ project$ php artisan tenancy:migrate
 ```
 
 ##### 4.2.1.2. _Controller_
-Para finalizar o CRUD criamos o _controller_ de 'cargos'. Por questão da organização vamos criá-lo em uma pasta especifica apenas para os _controllers_ dos _tenants_. O próximo comando o cria dentro da pasta `Tenant` no local padrão. Adicionamos os métodos padrões e resultado é apresentado na sequência:
+Para finalizar o CRUD criamos o _controller_ de 'cargos'. Por questão da organização vamos criá-lo em uma pasta especifica apenas para os _controllers_ dos _tenants_. O próximo comando o cria dentro da pasta `Tenant` no local padrão. Adicionamos os métodos padrões e o resultado é apresentado na sequência:
 ```sh
 project$ php artisan make:controller Tenant/CargoController
 ```
@@ -216,4 +216,74 @@ Para acessá-las basta seguir o padrão:
 http://batatinha-curitiba.projeto-tenancy.local.br/<nome da rota>?<field>=<valor>&<field>=<valor>...
 ```
 
-Caso você queira conferir os arquivos originais, eles podem ser acessados no _commit_ [0791ef3c27a37c63c14b82bbe17ea5a4f1d10241](https://github.com/brnocesar/multi-tenancy/commit/0791ef3c27a37c63c14b82bbe17ea5a4f1d10241).
+Caso você queira conferir os arquivos originais, eles podem ser acessados no _commit_ (0791ef3c27a37c63c14b82bbe17ea5a4f1d10241)[https://github.com/brnocesar/multi-tenancy/commit/0791ef3c27a37c63c14b82bbe17ea5a4f1d10241]. Note que no (_commit_)[https://github.com/brnocesar/multi-tenancy/commit/9c3e0272924c5c22567d7a68e4b5777f30860121] seguinte a coluna 'nome' foi retirada da tabela 'cargos' e a coluna 'descricao' assumiu este papel.
+
+#### 4.2.2. Colaboradores<a name='secao4.2.2'></a>
+Vamos iniciar agora o CRUD de colaboradores, em que será praticamento refeito o procedimento da seção anterior, apenas com uma pequena difereça na criação do _model_ e da _migration_. Ao contrário do objeto anterior em que obtivemos o seu plural acrescentando a letra 's', agora precisamos adicionar as letras 'es' ao final de colaborador para obtermos seu plural, e precisamos indicar isso ao Laravel (na verdade acho que o correto é dizer que "devemos indicar isso ao _Eloquent_", mas não tenho certeza). Portanto vamos criar _model_ e _migration_ separadas, explicitando o nome 'colaboradores' em ambas.
+
+Primeiro criamos a _model_ com o comando:
+```sh
+project$ php artisan make:model Models/Tenants/Colaborador
+```
+Após isso criamos a migration passando o nome da tabela no plural:
+```sh
+project$ php artisan make:migration create_colaboradores_table
+```
+Movemos este arquivo para a pasta `tenant`, definimos as colunas, seus tipos e valores padrão como na seção anterior, com a diferença de que precisamos definir uma coluna para a chave estrangeira que irá relacionar 'colaboradores' com 'cargos'. Além disso, note que na terceira linha do bloco abaixo temos o nome da coluna escrito corretamento no plural em português.
+```php
+    public function up()
+    {
+        Schema::create('colaboradores', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('matricula')->unique();
+            $table->string('nome');
+            $table->date('admissao')->default( date('Y-m-d H:i:s') );
+            $table->string('cracha')->nullable();
+            $table->string('cpf')->nullable();
+            $table->date('nascimento')->nullable();
+            $table->string('centro_custo')->nullable();
+            $table->boolean('status')->default(true);
+            $table->boolean('requerente')->default(false);
+            $table->unsignedBigInteger('cargo_id');
+            $table->foreign('cargo_id')->references('id')->on('cargos');
+
+            $table->softDeletes();
+            $table->timestamps();
+        });
+    }
+```
+
+Agora voltamos ao _model_, onde iremos adicionar o 'softDeletes', o nome da tabela no plural em português, o _fillable_ e a relação com a tabela 'cargos':
+```php
+<?php
+
+namespace App\Models\Tenants;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use  App\Models\Tenants\Cargo;
+
+class Colaborador extends Model
+{
+    use SoftDeletes;
+
+    protected $table = 'colaboradores';
+
+    protected $fillable = [ 'matricula', 'nome', 'empresa_id' ];
+
+    public function cargo(){
+        return $this->belongsTo(Cargo::class);
+    }
+}
+```
+
+Além disso devemos definir a relação com a tabela 'colaboradores' no _model_ de cargos (`app/Models/Tenants/Cargo.php`) e nos certificar de adicionar os devidos _namespaces_ em ambos os arquivos. Ao final destas alterações, basta rodar a _migration_ para todos os _tenats_ que já foram criadas.
+
+Para o _controller_ de 'colaboradores' realizamos o mesmo procedimento da seção anterior: criamos o _controller_ no diretório `app/Http/Controllers/Tenants` e os _formrequests_ em `project/app/Http/Requests/Tenants/Colaborador`.
+
+Criamos as rotas da mesma forma que a seção anterior:
+```php
+
+```
+
+Você pode acessar os arquivos originais no _commit_ (5b9b57e30e2cf63068406b8fe960c0f12ca2e906)[https://github.com/brnocesar/multi-tenancy/commit/5b9b57e30e2cf63068406b8fe960c0f12ca2e906].
