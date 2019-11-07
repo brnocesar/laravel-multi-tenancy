@@ -4,6 +4,7 @@ namespace App\Models\Tenants;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use  App\Models\Tenants\Colaborador;
 
 class Cargo extends Model
 {
@@ -16,8 +17,8 @@ class Cargo extends Model
         'requerente',
     ];
 
-    public function funcionarios(){
-        return $this->hasMany(Funcionario::class);
+    public function colaboradores(){
+        return $this->hasMany(Colaborador::class);
     }
 
 }

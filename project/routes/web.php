@@ -23,5 +23,11 @@ Route::get('updateCargo', 'Tenants\CargoController@update');
 Route::get('deleteCargo', 'Tenants\CargoController@destroy');
 Route::get('toListCargos', 'Tenants\CargoController@index');
 
+Route::get('createColaborador', 'Tenants\ColaboradorController@store');
+Route::get('showColaborador', 'Tenants\ColaboradorController@show');
+Route::get('updateColaborador', 'Tenants\ColaboradorController@update');
+Route::get('deleteColaborador', 'Tenants\ColaboradorController@destroy');
+Route::get('toListColaboradores', 'Tenants\ColaboradorController@index');
+
 
 Auth::routes();
