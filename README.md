@@ -42,7 +42,7 @@ Também é possível visualizar, editar e deletar um cargo específico, assim co
 - [Capítulo 3 - Criando _tenants_](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_3.md).
 - [Capítulo 4 - Estrutura dos _tenants_](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_4.md).
     - [4.1 - Estruturando os objetos/tabelas](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_4.md#secao4.1)
-    - [4.2 - CRUDs]
+    - 4.2 - CRUDs
         - [4.2.1 - Cargos](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_4.md#secao4.2.1)
         - [4.2.2 - Colaboradores](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_4.md#secao4.2.2)
 
