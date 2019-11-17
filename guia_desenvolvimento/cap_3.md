@@ -18,7 +18,7 @@ Como serão poucos _controllers_ para o sistema principal, podemos cria-lo no lo
 ```sh
 project$ php artisan make:controller TenantController
 ```
-Vamos escrever um método `store()` no que será responsável por criar os _tenants_. Escrevemos um método para garantir que o nome da Base de dados não ultrapasse 32 caracteres de comprimento (`setLimitCharacters()`) e rodamos as _migrations_ do _tenant_ criado atráves do método `runMigrations()`, que é chamado no retorno de `store()`.
+Vamos escrever um método `store()` que será responsável por criar os _tenants_. Escrevemos um método para garantir que o nome da Base de dados não ultrapasse 32 caracteres de comprimento (`setLimitCharacters()`) e rodamos as _migrations_ do _tenant_ criado atráves do método `runMigrations()`, que é chamado no retorno de `store()`.
 ```php
 class TenantController extends Controller
 {
@@ -134,7 +134,7 @@ project$ php artisan make:auth
 ```
 Para testar nossa aplicação devemos configurar um Virtual Host no Apache. (...)
 
-Abra o seu navegador e acesse o endereço do domínio principal que você colocou nos arquivos `/conf/httpd-vhosts.conf` ou `/etc/hosts` (em meu caso, por exemplo, é `project.local.br`), você será redirecionado para a página inicial padrão do Laravel. Então acesse a rota do método `store()` pela URL e passe os parâmetros da requisição, como mostrado abaixo:
+Abra o seu navegador e acesse o endereço do domínio principal que você colocou nos arquivos `/conf/httpd-vhosts.conf` e `/etc/hosts` (em meu caso, por exemplo, é `project.local.br`), você será redirecionado para a página inicial padrão do Laravel. Então acesse a rota do método `store()` pela URL e passe os parâmetros da requisição, como mostrado abaixo:
 ```
 project.local.br/createTenant?responsavel=Potter Potatos&fantasia=Batatinha&cidade=Curitiba&razao_social=Batatas Infinitas LTDA&cnpj=12345678
 ```
