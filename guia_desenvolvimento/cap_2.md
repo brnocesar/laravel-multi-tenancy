@@ -84,7 +84,11 @@ Após adicionar o pacote como uma dependência do projeto, devemos "publicar" os
 ```sh
 project$ php artisan vendor:publish --tag=tenancy
 ```
-Agora que temos as _migrations_ do pacote podemos adicionar novas colunas à tabela _hostnames_. O comando abaixo irá criar um arquivo com nome similar a `2019_xx_xx_xxxxxx_tenancy_add_fields_hostnames.php` no diretório padrão das _migrations_. Basta especificar as novas colunas na função `up()`, como no bloco abaixo:
+Agora que temos as _migrations_ do pacote podemos adicionar novas colunas à tabela _hostnames_. O comando abaixo irá criar um arquivo com nome similar a `2019_xx_xx_xxxxxx_tenancy_add_fields_hostnames.php` no diretório padrão das _migrations_. Então basta especificar as novas colunas na função `up()` deste arquivo, como no bloco que se segue:
+```sh
+project$ php artisan make:migrate tenancy_add_fields_hostnames --table==hostnames
+```
+
 ```php
     public function up()
     {
@@ -97,11 +101,11 @@ Agora que temos as _migrations_ do pacote podemos adicionar novas colunas à tab
         });
     }
 ```
-Também **devemos** criar uma pasta chamada `tenant` dentro do diretório `database/migrations`. Esta nova pasta irá armazenar as migrations comuns aos tenants, permitindo rodar de forma independente cada conjunto de _migrations_. As primeiras _migrations_ que colocaremos neste novo diretório são as criadas por padrão pelo Laravel, para tanto, copiamos (NÃO movemos, COPIAMOS!) os arquivos abaixo para o diretório `tenant`:
+Também **devemos** criar uma pasta chamada `tenant` dentro do diretório `database/migrations`. Esta nova pasta irá armazenar as migrations comuns aos tenants, permitindo rodar de forma independente cada conjunto de _migrations_. As primeiras _migrations_ que colocaremos neste novo diretório são as criadas por padrão pelo Laravel, para tanto, copiamos (NÃO movemos, COPIAMOS!) os seguintes arquivos para o diretório `tenant`:
 `2014_10_12_000000_create_users_table.php` e `2014_10_12_100000_create_password_resets_table.php`
 
 #### 2.3.2. _Includes_
-Devemos fazer um _"include"_ (não estou bem certo que é exatamente isso) no **model User** para forçar a conexão correta a ser feita na Base de Dados (melhorar essa parte!). Para isso basta adicionar:
+Devemos fazer um _"include"_ no **model User** para forçar a conexão correta a ser feita na Base de Dados (melhorar essa parte!). Para isso basta adicionar:
 ```php
 <?php
 
@@ -159,7 +163,8 @@ Após isso, executamos o comando abaixo para rodar as _migrations_ do sistema e 
 ```sh
 project$ php artisan migrate --database=system
 ```
-Não há necessidade de especificar a conexão usada pois o comando acima roda as migrations "do sistema principal", ou seja, as que estão fora da pasta `tenant`. Para rodar as migrations de todos os `tenants` podemos utilizar o comando apresentado abaixo, porém, usualmente isso não será necessário. Na próxima seção vamos adicionar um método ao `controller` que será responsável por rodar as `migrations` de cada tenant quando ele for criado.
+Não há necessidade de especificar a conexão usada pois o comando acima roda as migrations "do sistema principal", ou seja, as que estão fora da pasta `tenant`. Para rodar as migrations de todos os `tenants` podemos utilizar o comando apresentado abaixo. 
 ```sh
 project$ php artisan tenancy:migrate
 ```
+Na próxima seção vamos adicionar um método ao `controller` que será responsável por rodar as `migrations` de cada tenant quando ele for criado.
