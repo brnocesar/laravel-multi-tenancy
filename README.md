@@ -43,7 +43,7 @@ Também é possível visualizar, editar e deletar um cargo específico, assim co
 
 #### 2.2. CRUD de Colaboradores
 Para criar 'colaboradores' em cada um dos _tenants_ devemos passar os seguintes parâmetros:
-- matriucla: _string_ única;
+- matricula: _string_ única;
 - nome: _string_ não nula;
 - cargo_id: inteiro não nulo;
 - admissao: _date_ (valor padrão é a data atual);
@@ -146,7 +146,7 @@ project$ php artisan migrate:refresh
 - [Capítulo 2 - Configurando o ambiente para instalação do pacote Tenancy](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_2.md)
 - [Capítulo 3 - Criando _tenants_](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_3.md)
 - [Capítulo 4 - Estrutura dos _tenants_](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_4.md)
-    - [4.1 - Estruturando os objetos/tabelas](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_4.md#secao4.1)
+    - [4.1 - Estruturando nossa aplicação](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_4.md#secao4.1)
     - 4.2 - CRUDs
         - [4.2.1 - Cargos](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_4.md#secao4.2.1)
         - [4.2.2 - Colaboradores](https://github.com/brnocesar/multi-tenancy/blob/master/guia_desenvolvimento/cap_4.md#secao4.2.2)
@@ -155,11 +155,11 @@ project$ php artisan migrate:refresh
 
 ## Configurando um _Virtual Host_ no Apache<a name="vh"></a>
 ##### 1. Arquivo de _Virtual Host_
-Para testar-mos nossa aplicação devemos configurar um _Virtual Host_ no Apache. O primeiro passo para isso é criar um arquivo para o _virtual host_ do nosso projeto, estes arquivos ficam no diretório `/etc/apache2/sites-available/`. Fazemos uma cópia do arquivo padrão nomeando-a como `project.local.br.conf`:
+Para testarmos nossa aplicação devemos configurar um _Virtual Host_ no Apache. O primeiro passo para isso é criar um arquivo para o _virtual host_ do nosso projeto, estes arquivos ficam no diretório `/etc/apache2/sites-available/`. Fazemos uma cópia do arquivo padrão nomeando-a como `project.local.br.conf`:
 ```
 $ sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/project.local.br.conf
 ```
-Suprimindo os comentários o arquivo ficará parecido com o bloco abaixo (provavelmente o bloco abaixo não estará em seu arquivo, então basta colá-lo no final).
+Suprimindo os comentários o arquivo ficará parecido com o bloco abaixo (provavelmente o este bloco não estará em seu arquivo, então basta colá-lo no final).
 ```
 <VirtualHost *:80>
  ServerName
@@ -173,18 +173,20 @@ Suprimindo os comentários o arquivo ficará parecido com o bloco abaixo (provav
  </Directory>
 </VirtualHost>
 ```
-As principais diretivas que devemos "preencher" são:
+As diretivas que devemos preencher são:
 - **ServerName**: estabelece o domínio de base que deve corresponder à esta definição de virtual host;
 - **ServerAlias**: define outros nomes que devem corresponder como se fossem o nome de base (subdomínios, www, etc);
 - **DocumentRoot**: reflete o diretório que contém o arquivo raiz do projeto (index.html, index.php, etc);
 - **Directory**: contém o caminho do diretório raiz de nosso projeto.
 
-Para descobrir o caminho do arquivo raiz, utilizando o terminal, navegue até a pasta 'public' do projeto Laravel e então rode o comando `$ pwd` (_print working directory_):
+Podemos obter o caminho do arquivo raiz utilizando o terminal, para isso navegue até a pasta 'public' do projeto Laravel e então rode o comando `$ pwd` (_print working directory_). Agora basta colar a saída deste comando na diretiva **DocumentRoot**.
 ```sh
 project$ cd public
 project/public$ pwd 
 ```
-Então basta colar a saída deste comando na diretiva **DocumentRoot**. No caso de projetos Laravel, a raiz do projeto fica 1 nível acima do arquivo raiz. No meu caso, o bloco que deve ser adicionado ao arquivo de _virtual host_ ficou assim:
+Para projetos Laravel, a raiz do projeto fica 1 (um) nível acima do arquivo raiz.
+
+No meu caso, o bloco que deve ser adicionado ao arquivo de _virtual host_ ficou assim:
 ```
 <VirtualHost *:80>
  ServerName project.local.br
