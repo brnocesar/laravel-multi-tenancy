@@ -13,18 +13,18 @@
 # Desenvolvimento de aplicação _Multi-tenant_ usando o pacote [Tenancy](https://tenancy.dev/)
 
 ## 4. Estrutura dos _tenants_
-### 4.1. Estruturando os objetos/tabelas<a name='secao4.1'></a>
-Os objetos necessários para que os _tenants_ funcionem são: **colaboradores**, **cargos**, **produtos** e **salários**. E eles se relacionam da seguinte forma:
-- cada **colaborador** cadastrado terá um **cargo**;
-- cada **cargo** pode ser ocupado por mais de um **colaborador**;
-- os **produtos** que cada colaborador terá acesso dependem de seu **cargo**;
-- cada **produto** pode estar disponível a mais de um **cargo**;
+### 4.1. Estruturando nossa aplicação<a name='secao4.1'></a>
+As classes necessários para que os _tenants_ funcionem são: **Colaborador**, **Cargo**, **Produto** e **Salário**, e elas se relacionam da seguinte forma:
+- cada **Colaborador** cadastrado terá um **Cargo**;
+- cada **Cargo** pode ser ocupado por mais de um **Colaborador**;
+- os **Produtos** que cada colaborador terá acesso dependem de seu **Cargo**;
+- cada **Produto** pode estar disponível a mais de um **Cargo**;
 - e é claro, como os colaboradores não são relógios (pra trabalhar de graça), cada colaborador terá seu próprio **salário**.
 
-Agora vamos "traduzir" esses relacionamentos para a lógica das tabelas no Banco de Dados:
+Agora vamos "traduzir" os itens acima para a lógica de relacionamentos no Banco de Dados:
 1. **cargos x colaboradores**: cada cargo pode ter vários colaboradores (`hasMany`) e cada colaborador pertence a um cargo (`belongsTo`). Basicamente se trata de uma relação do tipo 1:N e a tabela 'colaboradores' terá uma chave estrangeira apontando para a tabela 'cargos';
 2. **cargos x produtos**: cada cargo pode ter vários produtos associados (`belongsToMany`), assim como cada produto pode pertencer a diferentes cargos (`belongsToMany`). Esta  é uma relação do tipo N:N, o que significa que precisaremos de uma tabela pivô para relacionar os _id_'s;
-3. **colaboradores x salarios**: cada colaborador tem apenas um salário (`hasOne`) e cada salário é específico para o colaborador (`belongs`). Aqui temos a relação mais simples possível, 1:1, então precisamos apenas de uma chave estrangeira na 'salarios' apontando para 'colaboradores'.
+3. **colaboradores x salarios**: cada colaborador tem apenas um salário (`hasOne`) e cada salário é específico para o colaborador (`belongs`). Aqui temos a relação mais simples possível, 1:1, então precisamos apenas de uma chave estrangeira na tabela 'salarios' apontando para 'colaboradores'.
 
 ### 4.2. CRUDs
 #### 4.2.1. Cargos<a name='secao4.2.1'></a>
